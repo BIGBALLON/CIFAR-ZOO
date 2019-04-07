@@ -1,0 +1,41 @@
+architecture: resnet20
+data_path: ./data
+ckpt_path: ./
+ckpt_name: ckpt
+use_gpu: True
+input_size: 32
+batch_size: 128
+test_batch: 200
+num_classes: 100
+dataset: cifar100
+workers: 3
+epochs: 250
+eval_freq: 2
+
+optimize:
+  momentum: 0.9
+  weight_decay: 0.0001
+  nesterov: True
+
+augmentation:
+  normalize: True
+  random_crop: True
+  random_horizontal_filp: True
+  
+lr_scheduler:
+  type: STEP     # STEP or COSINE or HTD
+  base_lr: 0.1
+  
+  # only for STEP
+  lr_epochs: [100, 150, 200] 
+  lr_mults: 0.1
+
+  # for HTD and COSINE
+  min_lr: 0.0
+
+  # only for HTD
+  lower_bound: -6.0
+  upper_bound: 3.0 
+  
+
+        
