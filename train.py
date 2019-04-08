@@ -95,7 +95,7 @@ def test(test_loader, net, criterion, optimizer, epoch, device):
         'optimizer': optimizer.state_dict(),
     }
     is_best = acc > best_prec
-    save_checkpoint(state, is_best, args.work_path + config.ckpt_name)
+    save_checkpoint(state, is_best, args.work_path + '/' + config.ckpt_name)
     if is_best:
         best_prec = acc
 
