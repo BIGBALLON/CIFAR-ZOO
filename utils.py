@@ -35,6 +35,22 @@ def save_checkpoint(state, is_best, filename):
         shutil.copyfile(filename+'.pth.tar', filename+'_best.pth.tar')
 
 
+def load_checkpoint(path, model, optimizer=None):
+    if os.path.isfile(path):
+        print("=== loading checkpoint '{}' ===".format(path))
+
+        checkpoint = torch.load(path)
+        model.load_state_dict(checkpoint['state_dict'], strict=False)
+
+        if optimizer != None:
+            best_prec = checkpoint['best_prec']
+            last_epoch = checkpoint['last_epoch']
+            optimizer.load_state_dict(checkpoint['optimizer'])
+            print("=== done. also loaded optimizer from checkpoint '{}' (epoch {}) ===".format(
+                path, last_epoch + 1))
+            return best_prec, last_epoch
+
+
 def get_data_loader(transform_train, transform_test, config):
     assert config.dataset == 'cifar10' or config.dataset == 'cifar100'
     if config.dataset == "cifar10":
@@ -56,22 +72,6 @@ def get_data_loader(transform_train, transform_test, config):
     test_loader = torch.utils.data.DataLoader(
         testset, batch_size=config.test_batch, shuffle=False, num_workers=config.workers)
     return train_loader, test_loader
-
-
-def load_checkpoint(path, model, optimizer=None):
-    if os.path.isfile(path):
-        print("=== loading checkpoint '{}' ===".format(path))
-
-        checkpoint = torch.load(path)
-        model.load_state_dict(checkpoint['state_dict'], strict=False)
-
-        if optimizer != None:
-            best_prec = checkpoint['best_prec']
-            last_epoch = checkpoint['last_epoch']
-            optimizer.load_state_dict(checkpoint['optimizer'])
-            print("=== done. also loaded optimizer from checkpoint '{}' (epoch {}) ===".format(
-                path, last_epoch + 1))
-            return best_prec, last_epoch
 
 
 def get_current_lr(optimizer):

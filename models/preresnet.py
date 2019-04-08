@@ -4,9 +4,10 @@ Ported form (c) YANG, Wei
 https://github.com/bearpaw/pytorch-classification/blob/master/models/cifar/preresnet.py
 
 '''
+import math
 
 import torch.nn as nn
-import math
+
 
 __all__ = ['preresnet20', 'preresnet32', 'preresnet44',
            'preresnet56', 'preresnet110', 'preresnet1202']

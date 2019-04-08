@@ -4,6 +4,7 @@ Ported form (c) YANG, Wei
 https://github.com/bearpaw/pytorch-classification/blob/master/models/cifar/resnet.py
 '''
 import math
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

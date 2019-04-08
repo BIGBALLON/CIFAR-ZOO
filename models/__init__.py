@@ -1,6 +1,8 @@
 from .resnet import *
 from .preresnet import *
 from .alexnet import *
+from .vgg import *
+from .densenet import *
 
 
 def get_model(config):
