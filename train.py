@@ -7,6 +7,8 @@ import torchvision
 import torchvision.transforms as transforms
 import torch.backends.cudnn as cudnn
 
+from tensorboardX import SummaryWriter
+
 from easydict import EasyDict
 from models import *
 from utils import *
@@ -16,8 +18,13 @@ parser.add_argument('--work-path', required=True, type=str)
 parser.add_argument('--resume', action='store_true',
                     help='resume from checkpoint')
 
+args = parser.parse_args()
+logger = Logger(log_file_name=args.work_path + '/log.txt',
+                log_level=logging.DEBUG, logger_name="CIFAR").get_log()
+
 
 def train(train_loader, net, criterion, optimizer, epoch, device):
+    global writer
 
     start = time.time()
     net.train()
@@ -25,7 +32,7 @@ def train(train_loader, net, criterion, optimizer, epoch, device):
     train_loss = 0
     correct = 0
     total = 0
-    print(" === Epoch: [{}/{}] === ".format(epoch + 1, config.epochs))
+    logger.info(" === Epoch: [{}/{}] === ".format(epoch + 1, config.epochs))
 
     for batch_index, (inputs, targets) in enumerate(train_loader):
         # move tensor to GPU
@@ -48,21 +55,27 @@ def train(train_loader, net, criterion, optimizer, epoch, device):
         correct += predicted.eq(targets).sum().item()
 
         if (batch_index + 1) % 100 == 0:
-            print("   == step: [{:3}/{}], train loss: {:.3f} | train acc: {:6.3f}% | lr: {:.6f}".format(
+            logger.info("   == step: [{:3}/{}], train loss: {:.3f} | train acc: {:6.3f}% | lr: {:.6f}".format(
                 batch_index + 1, len(train_loader),
                 train_loss/(batch_index+1), 100.0*correct/total, get_current_lr(optimizer)))
 
-    print("   == step: [{:3}/{}], train loss: {:.3f} | train acc: {:6.3f}% | lr: {:.6f}".format(
+    logger.info("   == step: [{:3}/{}], train loss: {:.3f} | train acc: {:6.3f}% | lr: {:.6f}".format(
         batch_index + 1, len(train_loader),
         train_loss/(batch_index+1), 100.0*correct/total, get_current_lr(optimizer)))
 
     end = time.time()
-    print("   == cost time: {:.4f}s".format(end - start))
-    return train_loss / (batch_index+1), correct / total
+    logger.info("   == cost time: {:.4f}s".format(end - start))
+    train_loss = train_loss / (batch_index + 1)
+    train_acc = correct / total
+
+    writer.add_scalar('train_loss', train_loss, epoch)
+    writer.add_scalar('train_acc', train_acc, epoch)
+
+    return train_loss, train_acc
 
 
 def test(test_loader, net, criterion, optimizer, epoch, device):
-    global best_prec
+    global best_prec, writer
 
     net.eval()
 
@@ -70,7 +83,7 @@ def test(test_loader, net, criterion, optimizer, epoch, device):
     correct = 0
     total = 0
 
-    print(" === Validate ===".format(epoch + 1, config.epochs))
+    logger.info(" === Validate ===".format(epoch + 1, config.epochs))
 
     with torch.no_grad():
         for batch_index, (inputs, targets) in enumerate(test_loader):
@@ -83,9 +96,12 @@ def test(test_loader, net, criterion, optimizer, epoch, device):
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
 
-    print("   == test loss: {:.3f} | test acc: {:6.3f}%".format(
+    logger.info("   == test loss: {:.3f} | test acc: {:6.3f}%".format(
         test_loss/(batch_index+1), 100.0*correct/total))
-
+    test_loss = test_loss / (batch_index + 1)
+    test_acc = correct / total
+    writer.add_scalar('test_loss', test_loss, epoch)
+    writer.add_scalar('test_acc', test_acc, epoch)
     # Save checkpoint.
     acc = 100.*correct/total
     state = {
@@ -101,8 +117,8 @@ def test(test_loader, net, criterion, optimizer, epoch, device):
 
 
 def main():
-    global args, config, last_epoch, best_prec
-    args = parser.parse_args()
+    global args, config, last_epoch, best_prec, writer
+    writer = SummaryWriter(log_dir=args.work_path + '/event')
 
     # read config from yaml file
     with open(args.work_path + '/config.yaml') as f:
@@ -112,10 +128,6 @@ def main():
 
     # define netowrk
     net = get_model(config)
-
-    # print args and network architecture
-    print(args)
-    print(net)
 
     # CPU or GPU
     device = 'cuda' if config.use_gpu else 'cpu'
@@ -140,8 +152,6 @@ def main():
         if args.resume:
             best_prec, last_epoch = load_checkpoint(
                 ckpt_file_name, net, optimizer=optimizer)
-        else:
-            load_checkpoint(ckpt_file_name, net)
 
     # load training data, do data augmentation and get data loader
     transform_train = transforms.Compose(
@@ -153,9 +163,10 @@ def main():
     train_loader, test_loader = get_data_loader(
         transform_train, transform_test, config)
 
-    print("\n=======  Training  =======\n")
+    logger.info("\n=======  Training  =======\n")
     for epoch in range(last_epoch + 1, config.epochs):
-        adjust_learning_rate(optimizer, epoch, config)
+        lr = adjust_learning_rate(optimizer, epoch, config)
+        writer.add_scalar('learning_rate', lr, epoch)
         train(train_loader, net, criterion, optimizer, epoch, device)
         if epoch == 0 or (epoch + 1) % config.eval_freq == 0 or epoch == config.epochs - 1:
             test(test_loader, net, criterion, optimizer, epoch, device)
