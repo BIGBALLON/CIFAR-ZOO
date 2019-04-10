@@ -18,9 +18,9 @@ optimize:
   nesterov: True
 
 augmentation:
-  is_normalize: True
-  is_random_crop: True
-  is_random_horizontal_filp: True
+  normalize: True
+  random_crop: True
+  random_horizontal_filp: True
   
 lr_scheduler:
   type: COSINE     # STEP or COSINE or HTD
