@@ -24,23 +24,23 @@ class BasicBlock(nn.Module):
 
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(BasicBlock, self).__init__()
-        self.conv1 = conv3x3(inplanes, planes, stride)
-        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv_1 = conv3x3(inplanes, planes, stride)
+        self.bn_1 = nn.BatchNorm2d(planes)
         self.relu = nn.ReLU(inplace=True)
-        self.conv2 = conv3x3(planes, planes)
-        self.bn2 = nn.BatchNorm2d(planes)
+        self.conv_2 = conv3x3(planes, planes)
+        self.bn_2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
         self.stride = stride
 
     def forward(self, x):
         residual = x
 
-        out = self.conv1(x)
-        out = self.bn1(out)
+        out = self.conv_1(x)
+        out = self.bn_1(out)
         out = self.relu(out)
 
-        out = self.conv2(out)
-        out = self.bn2(out)
+        out = self.conv_2(out)
+        out = self.bn_2(out)
 
         if self.downsample is not None:
             residual = self.downsample(x)
@@ -56,13 +56,13 @@ class Bottleneck(nn.Module):
 
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(Bottleneck, self).__init__()
-        self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
-                               padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(planes)
-        self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(planes * 4)
+        self.conv_1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
+        self.bn_1 = nn.BatchNorm2d(planes)
+        self.conv_2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
+                                padding=1, bias=False)
+        self.bn_2 = nn.BatchNorm2d(planes)
+        self.conv_3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
+        self.bn_3 = nn.BatchNorm2d(planes * 4)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
@@ -70,16 +70,16 @@ class Bottleneck(nn.Module):
     def forward(self, x):
         residual = x
 
-        out = self.conv1(x)
-        out = self.bn1(out)
+        out = self.conv_1(x)
+        out = self.bn_1(out)
         out = self.relu(out)
 
-        out = self.conv2(out)
-        out = self.bn2(out)
+        out = self.conv_2(out)
+        out = self.bn_2(out)
         out = self.relu(out)
 
-        out = self.conv3(out)
-        out = self.bn3(out)
+        out = self.conv_3(out)
+        out = self.bn_3(out)
 
         if self.downsample is not None:
             residual = self.downsample(x)
@@ -109,9 +109,9 @@ class ResNet(nn.Module):
             raise ValueError('block_name shoule be Basicblock or Bottleneck')
 
         self.inplanes = 16
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1,
-                               bias=False)
-        self.bn1 = nn.BatchNorm2d(16)
+        self.conv_1 = nn.Conv2d(3, 16, kernel_size=3, padding=1,
+                                bias=False)
+        self.bn_1 = nn.BatchNorm2d(16)
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self._make_layer(block, 16, n)
         self.layer2 = self._make_layer(block, 32, n, stride=2)
@@ -145,8 +145,8 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = self.bn1(x)
+        x = self.conv_1(x)
+        x = self.bn_1(x)
         x = self.relu(x)    # 32x32
 
         x = self.layer1(x)  # 32x32

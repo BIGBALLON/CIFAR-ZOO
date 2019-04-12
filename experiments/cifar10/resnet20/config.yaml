@@ -1,4 +1,4 @@
-architecture: resnet20
+architecture: resnext29_8x64d
 data_path: ./data
 ckpt_path: ./
 ckpt_name: ckpt
@@ -9,14 +9,14 @@ test_batch: 200
 num_classes: 10
 dataset: cifar10 # cifar100
 workers: 3
-epochs: 250
+epochs: 300
 eval_freq: 2
 mixup: True
 mixup_alpha: 0.4
 
 optimize:
   momentum: 0.9
-  weight_decay: 0.0001
+  weight_decay: 0.0005
   nesterov: True
 
 augmentation:
@@ -32,7 +32,7 @@ lr_scheduler:
   base_lr: 0.1
   
   # only for STEP
-  lr_epochs: [100, 150, 200] 
+  lr_epochs: [150, 225] 
   lr_mults: 0.1
 
   # for HTD and COSINE
