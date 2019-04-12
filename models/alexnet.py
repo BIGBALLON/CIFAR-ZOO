@@ -1,7 +1,4 @@
-'''
-AlexNet for CIFAR10. FC layers are removed. Paddings are adjusted.
-(c) YANG, Wei 
-'''
+# -*-coding:utf-8-*-
 import torch.nn as nn
 
 
@@ -27,12 +24,12 @@ class AlexNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
         )
-        self.classifier = nn.Linear(256, num_classes)
+        self.fc = nn.Linear(256, num_classes)
 
     def forward(self, x):
         x = self.features(x)
         x = x.view(x.size(0), -1)
-        x = self.classifier(x)
+        x = self.fc(x)
         return x
 
 
