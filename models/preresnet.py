@@ -121,7 +121,6 @@ class PreResNet(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                # nn.init.xavier_normal(m.weight.data)
                 nn.init.kaiming_normal(m.weight.data)
             elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
@@ -145,9 +144,9 @@ class PreResNet(nn.Module):
     def forward(self, x):
         x = self.conv_1(x)   # 32x32
 
-        x = self.layer1(x)  # 32x32
-        x = self.layer2(x)  # 16x16
-        x = self.layer3(x)  # 8x8
+        x = self.layer1(x)   # 32x32
+        x = self.layer2(x)   # 16x16
+        x = self.layer3(x)   # 8x8
         x = self.bn(x)
         x = self.relu(x)
 

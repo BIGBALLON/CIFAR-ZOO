@@ -2,26 +2,41 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-__all__ = ['resnext29_8x64d', 'resnext29_16x64d']
+__all__ = ['se_resnext29_8x64d', 'se_resnext29_16x64d']
+
+
+class SEModule(nn.Module):
+
+    def __init__(self, channels, reduction=16):
+        super(SEModule, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.fc_1 = nn.Conv2d(channels, channels // reduction, kernel_size=1,
+                              padding=0)
+        self.relu = nn.ReLU(inplace=True)
+        self.fc_2 = nn.Conv2d(channels // reduction, channels, kernel_size=1,
+                              padding=0)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        original = x
+        x = self.avg_pool(x)
+        x = self.fc_1(x)
+        x = self.relu(x)
+        x = self.fc_2(x)
+        x = self.sigmoid(x)
+        return original * x
 
 
 class Bottleneck(nn.Module):
 
     def __init__(self, in_channels, out_channels, stride, cardinality, base_width, expansion):
-        """ Constructor
-        Args:
-            in_channels: input channel dimensionality
-            out_channels: output channel dimensionality
-            stride: conv stride. Replaces pooling layer.
-            cardinality: num of convolution groups.
-            base_width: base number of channels in each group.
-            expansion: factor to reduce the input dimensionality before convolution.
-        """
+
         super(Bottleneck, self).__init__()
         width_ratio = out_channels / (expansion * 64.)
         D = cardinality * int(base_width * width_ratio)
 
         self.relu = nn.ReLU(inplace=True)
+        self.se_module = SEModule(out_channels)
 
         self.conv_reduce = nn.Conv2d(
             in_channels, D, kernel_size=1, stride=1, padding=0, bias=False)
@@ -48,26 +63,17 @@ class Bottleneck(nn.Module):
         out = self.relu(self.bn.forward(out))
         out = self.conv_expand.forward(out)
         out = self.bn_expand.forward(out)
+
         residual = self.shortcut.forward(x)
-        return self.relu(residual + out)
+
+        out = self.se_module(out) + residual
+        out = self.relu(out)
+        return out
 
 
-class ResNeXt(nn.Module):
-    """
-    ResNext optimized for the Cifar dataset, as specified in
-    https://arxiv.org/pdf/1611.05431.pdf
-    """
-
+class SeResNeXt(nn.Module):
     def __init__(self, cardinality, depth, num_classes, base_width, expansion=4):
-        """ Constructor
-        Args:
-            cardinality: number of convolution groups.
-            depth: number of layers.
-            num_classes: number of classes
-            base_width: base number of channels in each group.
-            expansion: factor to adjust the channel dimensionality
-        """
-        super(ResNeXt, self).__init__()
+        super(SeResNeXt, self).__init__()
         self.cardinality = cardinality
         self.depth = depth
         self.block_depth = (self.depth - 2) // 9
@@ -92,14 +98,6 @@ class ResNeXt(nn.Module):
                 m.bias.data.zero_()
 
     def block(self, name, in_channels, out_channels, pool_stride=2):
-        """ Stack n bottleneck modules where n is inferred from the depth of the network.
-        Args:
-            name: string name of the current block.
-            in_channels: number of input channels
-            out_channels: number of output channels
-            pool_stride: factor to reduce the spatial dimensionality in the first bottleneck of the block.
-        Returns: a Module consisting of n sequential bottlenecks.
-        """
         block = nn.Sequential()
         for bottleneck in range(self.block_depth):
             name_ = '%s_bottleneck_%d' % (name, bottleneck)
@@ -123,9 +121,9 @@ class ResNeXt(nn.Module):
         return self.fc(x)
 
 
-def resnext29_8x64d(num_classes):
-    return ResNeXt(cardinality=8, depth=29, num_classes=num_classes, base_width=64)
+def se_resnext29_8x64d(num_classes):
+    return SeResNeXt(cardinality=8, depth=29, num_classes=num_classes, base_width=64)
 
 
-def resnext29_16x64d(num_classes):
-    return ResNeXt(cardinality=16, depth=29, num_classes=num_classes, base_width=64)
+def se_resnext29_16x64d(num_classes):
+    return SeResNeXt(cardinality=16, depth=29, num_classes=num_classes, base_width=64)
