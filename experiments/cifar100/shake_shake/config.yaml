@@ -13,7 +13,7 @@ dataset: cifar100
 # training parameters
 use_gpu: True
 input_size: 32
-epochs: 250
+epochs: 1800
 batch_size: 128
 test_batch: 200
 eval_freq: 2
