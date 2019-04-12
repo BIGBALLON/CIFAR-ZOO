@@ -1,10 +1,10 @@
 # net architecture
-architecture: densenet100bc
+architecture: preresnet20
 
 # log and checkpoint
 data_path: ./data
 ckpt_path: ./
-ckpt_name: densenet100bc
+ckpt_name: preresnet20
 
 # datasets
 num_classes: 10
@@ -13,8 +13,8 @@ dataset: cifar10
 # training parameters
 use_gpu: True
 input_size: 32
-epochs: 300
-batch_size: 64
+epochs: 250
+batch_size: 128
 test_batch: 200
 eval_freq: 2
 workers: 4
@@ -26,7 +26,7 @@ optimize:
   nesterov: True
 
 # regularization
-mixup: False
+mixup: True
 mixup_alpha: 0.4
 
 augmentation:
@@ -43,7 +43,7 @@ lr_scheduler:
   type: STEP    
   base_lr: 0.1
   # only for STEP
-  lr_epochs: [150, 225] 
+  lr_epochs: [100, 150, 200] 
   lr_mults: 0.1
   # for HTD and COSINE
   min_lr: 0.0
