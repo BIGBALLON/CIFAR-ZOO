@@ -1,4 +1,4 @@
-'''LeNet in PyTorch.'''
+# -*-coding:utf-8-*-
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -28,4 +28,4 @@ class LeNet(nn.Module):
 
 
 def lenet(num_classes):
-    return LeNet(num_classes)
+    return LeNet(num_classes=num_classes)

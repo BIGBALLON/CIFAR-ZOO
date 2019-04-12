@@ -1,8 +1,4 @@
-'''
-Resnet for cifar dataset.
-Ported form (c) YANG, Wei
-https://github.com/bearpaw/pytorch-classification/blob/master/models/cifar/resnet.py
-'''
+# -*-coding:utf-8-*-
 import math
 
 import torch
@@ -113,9 +109,9 @@ class ResNet(nn.Module):
                                 bias=False)
         self.bn_1 = nn.BatchNorm2d(16)
         self.relu = nn.ReLU(inplace=True)
-        self.layer1 = self._make_layer(block, 16, n)
-        self.layer2 = self._make_layer(block, 32, n, stride=2)
-        self.layer3 = self._make_layer(block, 64, n, stride=2)
+        self.stage_1 = self._make_layer(block, 16, n)
+        self.stage_2 = self._make_layer(block, 32, n, stride=2)
+        self.stage_3 = self._make_layer(block, 64, n, stride=2)
         self.avgpool = nn.AvgPool2d(8)
         self.fc = nn.Linear(64 * block.expansion, num_classes)
 
@@ -147,11 +143,11 @@ class ResNet(nn.Module):
     def forward(self, x):
         x = self.conv_1(x)
         x = self.bn_1(x)
-        x = self.relu(x)    # 32x32
+        x = self.relu(x)     # 32x32
 
-        x = self.layer1(x)  # 32x32
-        x = self.layer2(x)  # 16x16
-        x = self.layer3(x)  # 8x8
+        x = self.stage_1(x)  # 32x32
+        x = self.stage_2(x)  # 16x16
+        x = self.stage_3(x)  # 8x8
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)

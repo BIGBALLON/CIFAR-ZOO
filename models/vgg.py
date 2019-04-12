@@ -1,14 +1,12 @@
-'''VGG for CIFAR10. FC layers are removed.
-reference: https://github.com/bearpaw/pytorch-classification/blob/master/models/cifar/vgg.py
-'''
+# -*-coding:utf-8-*-
 import math
 
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 
 
-__all__ = ['vgg11', 'vgg11_bn', 'vgg13', 'vgg13_bn', 'vgg16', 'vgg16_bn',
-           'vgg19_bn', 'vgg19']
+__all__ = ['vgg11',  'vgg13', 'vgg16', 'vgg19']
+
 cfg = {
     'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'B': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
@@ -64,32 +62,16 @@ def make_layers(cfg, batch_norm=False):
 
 
 def vgg11(num_classes):
-    return VGG(make_layers(cfg['A']), num_classes)
-
-
-def vgg11_bn(num_classes):
     return VGG(make_layers(cfg['A'], batch_norm=True), num_classes)
 
 
 def vgg13(num_classes):
-    return VGG(make_layers(cfg['B']), num_classes)
-
-
-def vgg13_bn(num_classes):
     return VGG(make_layers(cfg['B'], batch_norm=True), num_classes)
 
 
 def vgg16(num_classes):
-    return VGG(make_layers(cfg['D']), num_classes)
-
-
-def vgg16_bn(num_classes):
     return VGG(make_layers(cfg['D'], batch_norm=True), num_classes)
 
 
 def vgg19(num_classes):
-    return VGG(make_layers(cfg['E']), num_classes)
-
-
-def vgg19_bn(num_classes):
     return VGG(make_layers(cfg['E'], batch_norm=True), num_classes)

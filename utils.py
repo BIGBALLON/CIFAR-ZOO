@@ -1,5 +1,4 @@
-
-
+# -*-coding:utf-8-*-
 import os
 import math
 import shutil
@@ -41,7 +40,6 @@ class Cutout(object):
 
 
 class Logger(object):
-
     def __init__(self, log_file_name, log_level, logger_name):
         self.__logger = logging.getLogger(logger_name)
         self.__logger.setLevel(log_level)

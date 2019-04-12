@@ -1,9 +1,4 @@
-'''
-PreResnet for cifar dataset.
-Ported form (c) YANG, Wei
-https://github.com/bearpaw/pytorch-classification/blob/master/models/cifar/preresnet.py
-
-'''
+# -*-coding:utf-8-*-
 import math
 
 import torch.nn as nn
