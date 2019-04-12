@@ -141,7 +141,7 @@ def main():
 
     # define netowrk
     net = get_model(config)
-    print(net)
+    logger.info(net)
     logger.info(" == total parameters: " + str(count_parameters(net)))
 
     # CPU or GPU
