@@ -185,7 +185,7 @@ def main():
         train(train_loader, net, criterion, optimizer, epoch, device)
         if epoch == 0 or (epoch + 1) % config.eval_freq == 0 or epoch == config.epochs - 1:
             test(test_loader, net, criterion, optimizer, epoch, device)
-
+    logger.info("======== Training Finished.   best_test_acc: {:.3f}% ========".format(best_prec))
 
 if __name__ == "__main__":
     main()
