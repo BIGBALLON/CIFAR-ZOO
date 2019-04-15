@@ -89,11 +89,10 @@ and the ``√`` means which additional method be used. :cake:
 | preresnet20              |  250  |        |   √   |      92.71       |
 | preresnet20              |  250  |   √    |   √   |      92.66       |
 | preresnet110             |  250  |        |       |      94.24       |
-| preresnet110             |  250  |        |       |      94.24       |
 | preresnet110             |  250  |   √    |       |      94.67       |
 | preresnet110             |  250  |        |   √   |      94.94       |
 | preresnet110             |  250  |   √    |   √   |      95.66       |
-| se_resnext29_16x64d      |  300  |        |       |      96.10       |
+| se_resnext29_16x64d      |  300  |        |       |      96.15       |
 | se_resnext29_16x64d      |  300  |   √    |       |      96.60       |
 | se_resnext29_16x64d      |  300  |        |   √   |      96.86       |
 | se_resnext29_16x64d      |  300  |   √    |   √   |    **97.03**     |
