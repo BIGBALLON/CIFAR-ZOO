@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 
-__all__ = ['shake_resnet26_2x32', 'shake_resnet26_2x64']
+__all__ = ['shake_resnet26_2x32d', 'shake_resnet26_2x64d']
 
 
 class ShakeShake(torch.autograd.Function):

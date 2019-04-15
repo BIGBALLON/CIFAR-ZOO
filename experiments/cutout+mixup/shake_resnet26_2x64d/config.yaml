@@ -1,10 +1,10 @@
 # net architecture
-architecture: shake_resnet26_2x64
+architecture: shake_resnet26_2x64d
 
 # log and checkpoint
 data_path: ./data
 ckpt_path: ./
-ckpt_name: shake_resnet26_2x64
+ckpt_name: shake_resnet26_2x64d
 
 # datasets
 num_classes: 10
@@ -26,7 +26,7 @@ optimize:
   nesterov: True
 
 # regularization
-mixup: False
+mixup: True
 mixup_alpha: 0.4
 
 augmentation:
