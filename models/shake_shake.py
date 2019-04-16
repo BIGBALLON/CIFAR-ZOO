@@ -129,9 +129,9 @@ class ShakeResNet(nn.Module):
         return nn.Sequential(*layers)
 
 
-def shake_resnet26_2x32(num_classes):
+def shake_resnet26_2x32d(num_classes):
     return ShakeResNet(depth=26, base_width=32, num_classes=num_classes)
 
 
-def shake_resnet26_2x64(num_classes):
+def shake_resnet26_2x64d(num_classes):
     return ShakeResNet(depth=26, base_width=64, num_classes=num_classes)
