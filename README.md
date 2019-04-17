@@ -106,15 +106,16 @@ It's cool, right?
  
 ### With different LR scheduler
 
-
-| architecure  | epoch | step decay | cosine | htd(-6,3) | C10 test acc (%) |
-| :----------- | :---: | :--------: | :----: | :-------: | :--------------: |
-| preresnet20  |  250  |     √      |        |           |      91.88       |
-| preresnet20  |  250  |            |   √    |           |      92.13       |
-| preresnet20  |  250  |            |        |     √     |    **92.44**     |
-| preresnet110 |  250  |     √      |        |           |      94.24       |
-| preresnet110 |  250  |            |   √    |           |      94.48       |
-| preresnet110 |  250  |            |        |     √     |    **94.82**     |
+| architecure  | epoch | step decay | cosine | htd(-6,3) | cutout | mixup | C10 test acc (%) |
+| :----------- | :---: | :--------: | :----: | :-------: | :----: | :---: | :--------------: |
+| preresnet20  |  250  |     √      |        |           |        |       |      91.88       |
+| preresnet20  |  250  |            |   √    |           |        |       |      92.13       |
+| preresnet20  |  250  |            |        |     √     |        |       |      92.44       |
+| preresnet20  |  250  |            |        |     √     |   √    |   √   |    **93.30**     |
+| preresnet110 |  250  |     √      |        |           |        |       |      94.24       |
+| preresnet110 |  250  |            |   √    |           |        |       |      94.48       |
+| preresnet110 |  250  |            |        |     √     |        |       |      94.82       |
+| preresnet110 |  250  |            |        |     √     |   √    |   √   |    **95.88**     |
 
 
 ## Acknowledgments
