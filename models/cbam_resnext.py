@@ -70,7 +70,7 @@ class ChannelGate(nn.Module):
             else:
                 channel_att_sum = channel_att_sum + channel_att_raw
 
-        scale = F.sigmoid(channel_att_sum).unsqueeze(
+        scale = torch.sigmoid(channel_att_sum).unsqueeze(
             2).unsqueeze(3).expand_as(x)
         return x * scale
 
@@ -98,7 +98,7 @@ class SpatialGate(nn.Module):
     def forward(self, x):
         x_compress = self.compress(x)
         x_out = self.spatial(x_compress)
-        scale = F.sigmoid(x_out)  # broadcasting
+        scale = torch.sigmoid(x_out)  # broadcasting
         return x * scale
 
 
