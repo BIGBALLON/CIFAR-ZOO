@@ -8,6 +8,9 @@ from .senet import *
 from .resnext import *
 from .densenet import *
 from .shake_shake import *
+from .sknet import *
+from .genet import *
+from .cbam_resnext import *
 
 
 def get_model(config):
