@@ -13,6 +13,10 @@ This repository contains the pytorch code for multiple CNN architectures and imp
   - **(resnext)** [Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/abs/1611.05431)
   - **(densenet)** [Densely Connected Convolutional Networks](https://arxiv.org/abs/1608.06993)
   - **(senet)** [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)
+  - **(bam)** [BAM: Bottleneck Attention Module](https://arxiv.org/abs/1807.06514)
+  - **(cbam)** [CBAM: Convolutional Block Attention Module](https://arxiv.org/abs/1807.06521)
+  - **(genet)** [Gather-Excite: Exploiting Feature Context in Convolutional Neural Networks](https://arxiv.org/abs/1810.12348)
+  - **(sknet)** [SKNet: Selective Kernel Networks](https://arxiv.org/abs/1903.06586)
 - Regularization
   - **(shake-shake)** [Shake-Shake regularization](https://arxiv.org/abs/1705.07485)
   - **(cutout)** [Improved Regularization of Convolutional Neural Networks with Cutout](https://arxiv.org/abs/1708.04552)
@@ -62,18 +66,19 @@ The training log will be dumped via logging, check ``log.txt`` in your work path
 
 ### Vanilla architecures
 
-| architecure         |    GPUs    | params | batch size | epoch | C10 test acc (%) | C100 test acc (%) |
-| :------------------ | :--------: | :----: | :--------: | :---: | :--------------: | :---------------: |
-| Lecun               | 1 x 1080TI |  62K   |    128     |  250  |      67.46       |       34.10       |
-| alexnet             | 1 x 1080TI |  2.4M  |    128     |  250  |      75.56       |       38.67       |
-| vgg19               | 1 x 1080TI |  20M   |    128     |  250  |      93.00       |       72.07       |
-| preresnet20         | 1 x 1080TI | 0.27M  |    128     |  250  |      91.88       |       67.03       |
-| preresnet110        | 1 x 1080TI |  1.7M  |    128     |  250  |      94.24       |       72.96       |
-| preresnet1202       | 2 x 1080TI | 19.4M  |    128     |  250  |      94.74       |       75.28       |
-| densenet100bc       | 2 x 1080TI | 0.76M  |     64     |  300  |      95.08       |       77.55       |
-| densenet190bc       | 4 x 1080TI | 25.6M  |     64     |  300  |      96.11       |       82.59       |
-| resnext29_16x64d    | 2 x 1080TI | 68.1M  |    128     |  300  |      95.94       |       83.18       |
-| se_resnext29_16x64d | 2 x 1080TI | 68.6M  |    128     |  300  |    **96.15**     |     **83.65**     |
+| architecure           |    GPUs    | params | batch size | epoch | C10 test acc (%) | C100 test acc (%) |
+| :-------------------- | :--------: | :----: | :--------: | :---: | :--------------: | :---------------: |
+| Lecun                 | 1 x 1080TI |  62K   |    128     |  250  |      67.46       |       34.10       |
+| alexnet               | 1 x 1080TI |  2.4M  |    128     |  250  |      75.56       |       38.67       |
+| vgg19                 | 1 x 1080TI |  20M   |    128     |  250  |      93.00       |       72.07       |
+| preresnet20           | 1 x 1080TI | 0.27M  |    128     |  250  |      91.88       |       67.03       |
+| preresnet110          | 1 x 1080TI |  1.7M  |    128     |  250  |      94.24       |       72.96       |
+| preresnet1202         | 2 x 1080TI | 19.4M  |    128     |  250  |      94.74       |       75.28       |
+| densenet100bc         | 2 x 1080TI | 0.76M  |     64     |  300  |      95.08       |       77.55       |
+| densenet190bc         | 4 x 1080TI | 25.6M  |     64     |  300  |      96.11       |       82.59       |
+| resnext29_16x64d      | 2 x 1080TI | 68.1M  |    128     |  300  |      95.94       |       83.18       |
+| se_resnext29_16x64d   | 2 x 1080TI | 68.6M  |    128     |  300  |    **96.15**     |     **83.65**     |
+| cbam_resnext29_16x64d | 2 x 1080TI | 68.6M  |    128     |  300  |    **96.27**     |       83.62       |
 
 
 ### With additional regularization
@@ -127,7 +132,10 @@ Provided codes were adapted from
 - [timgaripov/swa](https://github.com/timgaripov/swa)
 - [xgastaldi/shake-shake](https://github.com/xgastaldi/shake-shake)
 - [uoguelph-mlrg/Cutout](https://github.com/uoguelph-mlrg/Cutout)
+- [facebookresearch/mixup-cifar10](https://github.com/facebookresearch/mixup-cifar10)
 - [BIGBALLON/cifar-10-cnn](https://github.com/BIGBALLON/cifar-10-cnn)
+- [BayesWatch/pytorch-GENet](https://github.com/BayesWatch/pytorch-GENet/)
+- [Jongchan/attention-module](https://github.com/Jongchan/attention-module)
 
 
 Feel free to contact me if you have any suggestions or questions, issues are welcome,   
