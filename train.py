@@ -1,18 +1,21 @@
 # -*-coding:utf-8-*-
 import argparse
+import logging
 import yaml
 import time
 import torch
 import torch.nn as nn
-import torchvision
 import torchvision.transforms as transforms
 import torch.backends.cudnn as cudnn
 
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 from easydict import EasyDict
 from models import *
-from utils import *
+
+from utils import Logger, count_parameters, data_augmentation, \
+    load_checkpoint, get_data_loader, mixup_data, mixup_criterion, \
+    save_checkpoint, adjust_learning_rate, get_current_lr
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR Dataset Training')
 parser.add_argument('--work-path', required=True, type=str)
@@ -39,8 +42,8 @@ def train(train_loader, net, criterion, optimizer, epoch, device):
         # move tensor to GPU
         inputs, targets = inputs.to(device), targets.to(device)
         if config.mixup:
-            inputs, targets_a, targets_b, lam = mixup_data(inputs, targets,
-                                                           config.mixup_alpha, device)
+            inputs, targets_a, targets_b, lam = mixup_data(
+                inputs, targets, config.mixup_alpha, device)
 
             outputs = net(inputs)
             loss = mixup_criterion(
@@ -69,19 +72,19 @@ def train(train_loader, net, criterion, optimizer, epoch, device):
         if (batch_index + 1) % 100 == 0:
             logger.info("   == step: [{:3}/{}], train loss: {:.3f} | train acc: {:6.3f}% | lr: {:.6f}".format(
                 batch_index + 1, len(train_loader),
-                train_loss/(batch_index+1), 100.0*correct/total, get_current_lr(optimizer)))
+                train_loss / (batch_index + 1), 100.0 * correct / total, get_current_lr(optimizer)))
 
     logger.info("   == step: [{:3}/{}], train loss: {:.3f} | train acc: {:6.3f}% | lr: {:.6f}".format(
         batch_index + 1, len(train_loader),
-        train_loss/(batch_index+1), 100.0*correct/total, get_current_lr(optimizer)))
+        train_loss / (batch_index + 1), 100.0 * correct / total, get_current_lr(optimizer)))
 
     end = time.time()
     logger.info("   == cost time: {:.4f}s".format(end - start))
     train_loss = train_loss / (batch_index + 1)
     train_acc = correct / total
 
-    writer.add_scalar('train_loss', train_loss, epoch)
-    writer.add_scalar('train_acc', train_acc, epoch)
+    writer.add_scalar('train_loss', train_loss, global_step=epoch)
+    writer.add_scalar('train_acc', train_acc, global_step=epoch)
 
     return train_loss, train_acc
 
@@ -109,13 +112,13 @@ def test(test_loader, net, criterion, optimizer, epoch, device):
             correct += predicted.eq(targets).sum().item()
 
     logger.info("   == test loss: {:.3f} | test acc: {:6.3f}%".format(
-        test_loss/(batch_index+1), 100.0*correct/total))
+        test_loss / (batch_index + 1), 100.0 * correct / total))
     test_loss = test_loss / (batch_index + 1)
     test_acc = correct / total
-    writer.add_scalar('test_loss', test_loss, epoch)
-    writer.add_scalar('test_acc', test_acc, epoch)
+    writer.add_scalar('test_loss', test_loss, global_step=epoch)
+    writer.add_scalar('test_acc', test_acc, global_step=epoch)
     # Save checkpoint.
-    acc = 100.*correct/total
+    acc = 100. * correct / total
     state = {
         'state_dict': net.state_dict(),
         'best_prec': best_prec,
@@ -155,9 +158,12 @@ def main():
 
     # define loss and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(net.parameters(), config.lr_scheduler.base_lr,
-                                momentum=config.optimize.momentum,
-                                weight_decay=config.optimize.weight_decay, nesterov=config.optimize.nesterov)
+    optimizer = torch.optim.SGD(
+        net.parameters(),
+        config.lr_scheduler.base_lr,
+        momentum=config.optimize.momentum,
+        weight_decay=config.optimize.weight_decay,
+        nesterov=config.optimize.nesterov)
 
     # resume from a checkpoint
     last_epoch = -1
@@ -183,9 +189,13 @@ def main():
         lr = adjust_learning_rate(optimizer, epoch, config)
         writer.add_scalar('learning_rate', lr, epoch)
         train(train_loader, net, criterion, optimizer, epoch, device)
-        if epoch == 0 or (epoch + 1) % config.eval_freq == 0 or epoch == config.epochs - 1:
+        if epoch == 0 or (
+                epoch + 1) % config.eval_freq == 0 or epoch == config.epochs - 1:
             test(test_loader, net, criterion, optimizer, epoch, device)
-    logger.info("======== Training Finished.   best_test_acc: {:.3f}% ========".format(best_prec))
+    writer.close()
+    logger.info(
+        "======== Training Finished.   best_test_acc: {:.3f}% ========".format(best_prec))
+
 
 if __name__ == "__main__":
     main()

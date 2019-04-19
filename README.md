@@ -30,10 +30,11 @@ This repository contains the pytorch code for multiple CNN architectures and imp
 
 ### Requirements
 
-- Python >= 3.5
-- PyTorch >= 0.4 
-- TensorFlow/Tensorboard (if you want to use the tensorboard for **visualization**)
-- Other dependencies (pyyaml, easydict, tensorboardX)
+- Python (**>=3.6**)
+- PyTorch (**>=1.1.0**)
+- Tensorboard(**>=1.4.0**) (for ***visualization***)
+- Other dependencies (pyyaml, easydict)
+
 
 ```bash
 pip install -r requirements.txt
@@ -64,9 +65,9 @@ The training log will be dumped via logging, check ``log.txt`` in your work path
 
 ## Results on CIFAR
 
-### Vanilla architecures
+### Vanilla architectures
 
-| architecure           | params | batch size | epoch | C10 test acc (%) | C100 test acc (%) |
+| architecture          | params | batch size | epoch | C10 test acc (%) | C100 test acc (%) |
 | :-------------------- | :----: | :--------: | :---: | :--------------: | :---------------: |
 | Lecun                 |  62K   |    128     |  250  |      67.46       |       34.10       |
 | alexnet               |  2.4M  |    128     |  250  |      75.56       |       38.67       |
@@ -77,8 +78,9 @@ The training log will be dumped via logging, check ``log.txt`` in your work path
 | densenet100bc         | 0.76M  |     64     |  300  |      95.08       |       77.55       |
 | densenet190bc         | 25.6M  |     64     |  300  |      96.11       |       82.59       |
 | resnext29_16x64d      | 68.1M  |    128     |  300  |      95.94       |       83.18       |
-| se_resnext29_16x64d   | 68.6M  |    128     |  300  |    **96.15**     |     **83.65**     |
-| cbam_resnext29_16x64d | 68.6M  |    128     |  300  |    **96.27**     |       83.62       |
+| se_resnext29_16x64d   | 68.6M  |    128     |  300  |      96.15       |     **83.65**     |
+| cbam_resnext29_16x64d | 68.7M  |    128     |  300  |    **96.27**     |       83.62       |
+| ge_resnext29_16x64d   | 70.0M  |    128     |  300  |      96.21       |       83.57       |
 
 
 ### With additional regularization
@@ -87,7 +89,7 @@ The training log will be dumped via logging, check ``log.txt`` in your work path
 PS: the default data augmentation methods are ``RandomCrop`` + ``RandomHorizontalFlip`` + ``Normalize``,   
 and the ``√`` means which additional method be used. :cake:
 
-| architecure              | epoch | cutout | mixup | C10 test acc (%) |
+| architecture             | epoch | cutout | mixup | C10 test acc (%) |
 | :----------------------- | :---: | :----: | :---: | :--------------: |
 | preresnet20              |  250  |        |       |      91.88       |
 | preresnet20              |  250  |   √    |       |      92.57       |
@@ -102,6 +104,7 @@ and the ``√`` means which additional method be used. :cake:
 | se_resnext29_16x64d      |  300  |        |   √   |      96.86       |
 | se_resnext29_16x64d      |  300  |   √    |   √   |    **97.03**     |
 | cbam_resnext29_16x64d    |  300  |   √    |   √   |    **97.16**     |
+| ge_resnext29_16x64d      |  300  |   √    |   √   |    **97.19**     |
 | --                       |  --   |   --   |  --   |        --        |
 | shake_resnet26_2x64d     | 1800  |        |       |      96.94       |
 | shake_resnet26_2x64d     | 1800  |   √    |       |    **97.20**     |
@@ -113,7 +116,7 @@ It's cool, right?
  
 ### With different LR scheduler
 
-| architecure  | epoch | step decay | cosine | htd(-6,3) | cutout | mixup | C10 test acc (%) |
+| architecture | epoch | step decay | cosine | htd(-6,3) | cutout | mixup | C10 test acc (%) |
 | :----------- | :---: | :--------: | :----: | :-------: | :----: | :---: | :--------------: |
 | preresnet20  |  250  |     √      |        |           |        |       |      91.88       |
 | preresnet20  |  250  |            |   √    |           |        |       |      92.13       |
@@ -138,7 +141,21 @@ Provided codes were adapted from
 - [BIGBALLON/cifar-10-cnn](https://github.com/BIGBALLON/cifar-10-cnn)
 - [BayesWatch/pytorch-GENet](https://github.com/BayesWatch/pytorch-GENet/)
 - [Jongchan/attention-module](https://github.com/Jongchan/attention-module)
+- [pppLang/SKNet](https://github.com/pppLang/SKNet)
 
 
 Feel free to contact me if you have any suggestions or questions, issues are welcome,   
 create a PR if you find any bugs or you want to contribute. :blush:     
+
+
+
+## Citation
+
+```
+@misc{bigballon2019cifarzoo,
+  author = {Wei Li},
+  title = {CIFAR-ZOO: PyTorch implementation of CNNs for CIFAR dataset},
+  howpublished = {\url{https://github.com/BIGBALLON/CIFAR-ZOO}},
+  year = {2019}
+}
+```

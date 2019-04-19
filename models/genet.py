@@ -26,11 +26,20 @@ class GEModule(nn.Module):
         super(GEModule, self).__init__()
         self.downop = Downblock(out_planes, kernel_size=spatial)
 
-        self.mlp = nn.Sequential(nn.Conv2d(out_planes, out_planes // 16, kernel_size=1, padding=0, bias=False),
-                                 nn.ReLU(),
-                                 nn.Conv2d(out_planes // 16, out_planes,
-                                           kernel_size=1, padding=0, bias=False)
-                                 )
+        self.mlp = nn.Sequential(
+            nn.Conv2d(
+                out_planes,
+                out_planes // 16,
+                kernel_size=1,
+                padding=0,
+                bias=False),
+            nn.ReLU(),
+            nn.Conv2d(
+                out_planes // 16,
+                out_planes,
+                kernel_size=1,
+                padding=0,
+                bias=False))
 
     def forward(self, x):
         # Down, up, sigmoid
@@ -45,7 +54,15 @@ class GEModule(nn.Module):
 
 class Bottleneck(nn.Module):
 
-    def __init__(self, in_channels, out_channels, stride, spatial, cardinality, base_width, expansion):
+    def __init__(
+            self,
+            in_channels,
+            out_channels,
+            stride,
+            spatial,
+            cardinality,
+            base_width,
+            expansion):
 
         super(Bottleneck, self).__init__()
         width_ratio = out_channels / (expansion * 64.)
@@ -58,7 +75,13 @@ class Bottleneck(nn.Module):
             in_channels, D, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn_reduce = nn.BatchNorm2d(D)
         self.conv_conv = nn.Conv2d(
-            D, D, kernel_size=3, stride=stride, padding=1, groups=cardinality, bias=False)
+            D,
+            D,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            groups=cardinality,
+            bias=False)
         self.bn = nn.BatchNorm2d(D)
         self.conv_expand = nn.Conv2d(
             D, out_channels, kernel_size=1, stride=1, padding=0, bias=False)
@@ -66,9 +89,15 @@ class Bottleneck(nn.Module):
 
         self.shortcut = nn.Sequential()
         if in_channels != out_channels:
-            self.shortcut.add_module('shortcut_conv',
-                                     nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, padding=0,
-                                               bias=False))
+            self.shortcut.add_module(
+                'shortcut_conv',
+                nn.Conv2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size=1,
+                    stride=stride,
+                    padding=0,
+                    bias=False))
             self.shortcut.add_module(
                 'shortcut_bn', nn.BatchNorm2d(out_channels))
 
@@ -88,7 +117,13 @@ class Bottleneck(nn.Module):
 
 
 class GeResNeXt(nn.Module):
-    def __init__(self, cardinality, depth, num_classes, base_width, expansion=4):
+    def __init__(
+            self,
+            cardinality,
+            depth,
+            num_classes,
+            base_width,
+            expansion=4):
         super(GeResNeXt, self).__init__()
         self.cardinality = cardinality
         self.depth = depth
@@ -121,12 +156,27 @@ class GeResNeXt(nn.Module):
         for bottleneck in range(self.block_depth):
             name_ = '%s_bottleneck_%d' % (name, bottleneck)
             if bottleneck == 0:
-                block.add_module(name_, Bottleneck(in_channels, out_channels, pool_stride, spatial, self.cardinality,
-                                                   self.base_width, self.expansion))
+                block.add_module(
+                    name_,
+                    Bottleneck(
+                        in_channels,
+                        out_channels,
+                        pool_stride,
+                        spatial,
+                        self.cardinality,
+                        self.base_width,
+                        self.expansion))
             else:
-                block.add_module(name_,
-                                 Bottleneck(out_channels, out_channels, 1, spatial, self.cardinality, self.base_width,
-                                            self.expansion))
+                block.add_module(
+                    name_,
+                    Bottleneck(
+                        out_channels,
+                        out_channels,
+                        1,
+                        spatial,
+                        self.cardinality,
+                        self.base_width,
+                        self.expansion))
         return block
 
     def forward(self, x):
@@ -141,8 +191,16 @@ class GeResNeXt(nn.Module):
 
 
 def ge_resnext29_8x64d(num_classes):
-    return GeResNeXt(cardinality=8, depth=29, num_classes=num_classes, base_width=64)
+    return GeResNeXt(
+        cardinality=8,
+        depth=29,
+        num_classes=num_classes,
+        base_width=64)
 
 
 def ge_resnext29_16x64d(num_classes):
-    return GeResNeXt(cardinality=16, depth=29, num_classes=num_classes, base_width=64)
+    return GeResNeXt(
+        cardinality=16,
+        depth=29,
+        num_classes=num_classes,
+        base_width=64)

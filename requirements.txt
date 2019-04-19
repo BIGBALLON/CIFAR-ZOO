@@ -1,3 +1,4 @@
 pyyaml
-easydict
-tensorboardX
+easydict>=1.9
+future>=0.17.1
+tensorboard>=1.14.0

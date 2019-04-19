@@ -8,16 +8,15 @@ __all__ = ['resnext29_8x64d', 'resnext29_16x64d']
 
 class Bottleneck(nn.Module):
 
-    def __init__(self, in_channels, out_channels, stride, cardinality, base_width, expansion):
-        """ Constructor
-        Args:
-            in_channels: input channel dimensionality
-            out_channels: output channel dimensionality
-            stride: conv stride. Replaces pooling layer.
-            cardinality: num of convolution groups.
-            base_width: base number of channels in each group.
-            expansion: factor to reduce the input dimensionality before convolution.
-        """
+    def __init__(
+            self,
+            in_channels,
+            out_channels,
+            stride,
+            cardinality,
+            base_width,
+            expansion):
+
         super(Bottleneck, self).__init__()
         width_ratio = out_channels / (expansion * 64.)
         D = cardinality * int(base_width * width_ratio)
@@ -28,7 +27,13 @@ class Bottleneck(nn.Module):
             in_channels, D, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn_reduce = nn.BatchNorm2d(D)
         self.conv_conv = nn.Conv2d(
-            D, D, kernel_size=3, stride=stride, padding=1, groups=cardinality, bias=False)
+            D,
+            D,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            groups=cardinality,
+            bias=False)
         self.bn = nn.BatchNorm2d(D)
         self.conv_expand = nn.Conv2d(
             D, out_channels, kernel_size=1, stride=1, padding=0, bias=False)
@@ -36,9 +41,15 @@ class Bottleneck(nn.Module):
 
         self.shortcut = nn.Sequential()
         if in_channels != out_channels:
-            self.shortcut.add_module('shortcut_conv',
-                                     nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, padding=0,
-                                               bias=False))
+            self.shortcut.add_module(
+                'shortcut_conv',
+                nn.Conv2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size=1,
+                    stride=stride,
+                    padding=0,
+                    bias=False))
             self.shortcut.add_module(
                 'shortcut_bn', nn.BatchNorm2d(out_channels))
 
@@ -59,7 +70,13 @@ class ResNeXt(nn.Module):
     https://arxiv.org/pdf/1611.05431.pdf
     """
 
-    def __init__(self, cardinality, depth, num_classes, base_width, expansion=4):
+    def __init__(
+            self,
+            cardinality,
+            depth,
+            num_classes,
+            base_width,
+            expansion=4):
         """ Constructor
         Args:
             cardinality: number of convolution groups.
@@ -93,24 +110,29 @@ class ResNeXt(nn.Module):
                 m.bias.data.zero_()
 
     def block(self, name, in_channels, out_channels, pool_stride=2):
-        """ Stack n bottleneck modules where n is inferred from the depth of the network.
-        Args:
-            name: string name of the current block.
-            in_channels: number of input channels
-            out_channels: number of output channels
-            pool_stride: factor to reduce the spatial dimensionality in the first bottleneck of the block.
-        Returns: a Module consisting of n sequential bottlenecks.
-        """
         block = nn.Sequential()
         for bottleneck in range(self.block_depth):
             name_ = '%s_bottleneck_%d' % (name, bottleneck)
             if bottleneck == 0:
-                block.add_module(name_, Bottleneck(in_channels, out_channels, pool_stride, self.cardinality,
-                                                   self.base_width, self.expansion))
+                block.add_module(
+                    name_,
+                    Bottleneck(
+                        in_channels,
+                        out_channels,
+                        pool_stride,
+                        self.cardinality,
+                        self.base_width,
+                        self.expansion))
             else:
-                block.add_module(name_,
-                                 Bottleneck(out_channels, out_channels, 1, self.cardinality, self.base_width,
-                                            self.expansion))
+                block.add_module(
+                    name_,
+                    Bottleneck(
+                        out_channels,
+                        out_channels,
+                        1,
+                        self.cardinality,
+                        self.base_width,
+                        self.expansion))
         return block
 
     def forward(self, x):
@@ -125,8 +147,16 @@ class ResNeXt(nn.Module):
 
 
 def resnext29_8x64d(num_classes):
-    return ResNeXt(cardinality=8, depth=29, num_classes=num_classes, base_width=64)
+    return ResNeXt(
+        cardinality=8,
+        depth=29,
+        num_classes=num_classes,
+        base_width=64)
 
 
 def resnext29_16x64d(num_classes):
-    return ResNeXt(cardinality=16, depth=29, num_classes=num_classes, base_width=64)
+    return ResNeXt(
+        cardinality=16,
+        depth=29,
+        num_classes=num_classes,
+        base_width=64)

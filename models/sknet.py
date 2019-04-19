@@ -19,11 +19,11 @@ class SKConv(nn.Module):
             L: the minimum dim of the vector z in paper, default 32.
         """
         super(SKConv, self).__init__()
-        d = max(int(features/r), L)
+        d = max(int(features / r), L)
         self.convs = nn.ModuleList([])
         for i in range(M):
             self.convs.append(nn.Sequential(
-                nn.Conv2d(features, features, kernel_size=1+i*2,
+                nn.Conv2d(features, features, kernel_size=1 + i * 2,
                           stride=stride, padding=i, groups=G),
                 nn.BatchNorm2d(features),
                 nn.ReLU(inplace=False)
@@ -62,7 +62,10 @@ class SKConv(nn.Module):
 
 class Bottleneck(nn.Module):
 
-    def __init__(self, in_channels, out_channels, stride, cardinality, base_width, expansion,  M, r, L):
+    def __init__(
+        self, in_channels, out_channels, stride, cardinality,
+        base_width, expansion, M, r, L
+    ):
         super(Bottleneck, self).__init__()
         width_ratio = out_channels / (expansion * 64.)
         D = cardinality * int(base_width * width_ratio)
@@ -81,9 +84,13 @@ class Bottleneck(nn.Module):
 
         self.shortcut = nn.Sequential()
         if in_channels != out_channels:
-            self.shortcut.add_module('shortcut_conv',
-                                     nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, padding=0,
-                                               bias=False))
+            self.shortcut.add_module(
+                'shortcut_conv',
+                nn.Conv2d(
+                    in_channels, out_channels, kernel_size=1, stride=stride,
+                    padding=0, bias=False
+                )
+            )
             self.shortcut.add_module(
                 'shortcut_bn', nn.BatchNorm2d(out_channels))
 
@@ -99,7 +106,10 @@ class Bottleneck(nn.Module):
 
 
 class SkResNeXt(nn.Module):
-    def __init__(self, cardinality, depth, num_classes, base_width, expansion=4, M=2, r=32, L=32):
+    def __init__(
+            self, cardinality, depth, num_classes, base_width, expansion=4,
+            M=2, r=32, L=32
+    ):
         super(SkResNeXt, self).__init__()
         self.M = M
         self.r = r
@@ -132,12 +142,32 @@ class SkResNeXt(nn.Module):
         for bottleneck in range(self.block_depth):
             name_ = '%s_bottleneck_%d' % (name, bottleneck)
             if bottleneck == 0:
-                block.add_module(name_, Bottleneck(in_channels, out_channels, pool_stride, self.cardinality,
-                                                   self.base_width, self.expansion, self.M, self.r, self.L))
+                block.add_module(
+                    name_,
+                    Bottleneck(
+                        in_channels,
+                        out_channels,
+                        pool_stride,
+                        self.cardinality,
+                        self.base_width,
+                        self.expansion,
+                        self.M,
+                        self.r,
+                        self.L)
+                )
             else:
-                block.add_module(name_,
-                                 Bottleneck(out_channels, out_channels, 1, self.cardinality, self.base_width,
-                                            self.expansion, self.M, self.r, self.L))
+                block.add_module(
+                    name_,
+                    Bottleneck(
+                        out_channels,
+                        out_channels,
+                        1,
+                        self.cardinality,
+                        self.base_width,
+                        self.expansion,
+                        self.M, self.r, self.L
+                    )
+                )
         return block
 
     def forward(self, x):
@@ -152,8 +182,18 @@ class SkResNeXt(nn.Module):
 
 
 def sk_resnext29_16x32d(num_classes):
-    return SkResNeXt(cardinality=16, depth=29, num_classes=num_classes, base_width=32)
+    return SkResNeXt(
+        cardinality=16,
+        depth=29,
+        num_classes=num_classes,
+        base_width=32
+    )
 
 
 def sk_resnext29_16x64d(num_classes):
-    return SkResNeXt(cardinality=16, depth=29, num_classes=num_classes, base_width=64)
+    return SkResNeXt(
+        cardinality=16,
+        depth=29,
+        num_classes=num_classes,
+        base_width=64
+    )

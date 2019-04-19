@@ -88,9 +88,9 @@ def data_augmentation(config, is_train=True):
 
 
 def save_checkpoint(state, is_best, filename):
-    torch.save(state, filename+'.pth.tar')
+    torch.save(state, filename + '.pth.tar')
     if is_best:
-        shutil.copyfile(filename+'.pth.tar', filename+'_best.pth.tar')
+        shutil.copyfile(filename + '.pth.tar', filename + '_best.pth.tar')
 
 
 def load_checkpoint(path, model, optimizer=None):
@@ -100,12 +100,13 @@ def load_checkpoint(path, model, optimizer=None):
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['state_dict'], strict=False)
 
-        if optimizer != None:
+        if optimizer is not None:
             best_prec = checkpoint['best_prec']
             last_epoch = checkpoint['last_epoch']
             optimizer.load_state_dict(checkpoint['optimizer'])
-            logging.info("=== done. also loaded optimizer from checkpoint '{}' (epoch {}) ===".format(
-                path, last_epoch + 1))
+            logging.info("=== done. also loaded optimizer from " +
+                         "checkpoint '{}' (epoch {}) ===".format(
+                             path, last_epoch + 1))
             return best_prec, last_epoch
 
 
@@ -113,22 +114,28 @@ def get_data_loader(transform_train, transform_test, config):
     assert config.dataset == 'cifar10' or config.dataset == 'cifar100'
     if config.dataset == "cifar10":
         trainset = torchvision.datasets.CIFAR10(
-            root=config.data_path, train=True, download=True, transform=transform_train)
+            root=config.data_path, train=True,
+            download=True, transform=transform_train)
 
         testset = torchvision.datasets.CIFAR10(
-            root=config.data_path, train=False, download=True, transform=transform_test)
+            root=config.data_path, train=False,
+            download=True, transform=transform_test)
     else:
         trainset = torchvision.datasets.CIFAR100(
-            root=config.data_path, train=True, download=True, transform=transform_train)
+            root=config.data_path, train=True,
+            download=True, transform=transform_train)
 
         testset = torchvision.datasets.CIFAR100(
-            root=config.data_path, train=False, download=True, transform=transform_test)
+            root=config.data_path, train=False,
+            download=True, transform=transform_test)
 
     train_loader = torch.utils.data.DataLoader(
-        trainset, batch_size=config.batch_size, shuffle=True, num_workers=config.workers)
+        trainset, batch_size=config.batch_size,
+        shuffle=True, num_workers=config.workers)
 
     test_loader = torch.utils.data.DataLoader(
-        testset, batch_size=config.test_batch, shuffle=False, num_workers=config.workers)
+        testset, batch_size=config.test_batch,
+        shuffle=False, num_workers=config.workers)
     return train_loader, test_loader
 
 
@@ -170,8 +177,12 @@ def adjust_learning_rate(optimizer, epoch, config):
         ratio = epoch / config.epochs
         lr = config.lr_scheduler.min_lr + \
             (config.lr_scheduler.base_lr - config.lr_scheduler.min_lr) * \
-            (1.0 - math.tanh(config.lr_scheduler.lower_bound +
-                             (config.lr_scheduler.upper_bound - config.lr_scheduler.lower_bound) * ratio)) / 2.0
+            (1.0 - math.tanh(
+                config.lr_scheduler.lower_bound
+                + (config.lr_scheduler.upper_bound
+                   - config.lr_scheduler.lower_bound)
+                * ratio)
+             ) / 2.0
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
     return lr

@@ -11,7 +11,7 @@ class LeNet(nn.Module):
         super(LeNet, self).__init__()
         self.conv_1 = nn.Conv2d(3, 6, 5)
         self.conv_2 = nn.Conv2d(6, 16, 5)
-        self.fc_1 = nn.Linear(16*5*5, 120)
+        self.fc_1 = nn.Linear(16 * 5 * 5, 120)
         self.fc_2 = nn.Linear(120, 84)
         self.fc_3 = nn.Linear(84, num_classes)
 
