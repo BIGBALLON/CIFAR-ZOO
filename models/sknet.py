@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-__all__ = ['sk_resnext29_8x64d', 'sk_resnext29_16x64d']
+__all__ = ['sk_resnext29_16x32d', 'sk_resnext29_16x64d']
 
 
 class SKConv(nn.Module):
@@ -61,59 +61,64 @@ class SKConv(nn.Module):
 
 
 class Bottleneck(nn.Module):
-    def __init__(self, in_features, out_features, M, G, r, stride=1, L=32):
-        """ Constructor
-        Args:
-            in_features: input channel dimensionality.
-            out_features: output channel dimensionality.
-            M: the number of branchs.
-            G: num of convolution groups.
-            r: the radio for compute d, the length of z.
-            stride: stride.
-            L: the minimum dim of the vector z in paper.
-        """
+
+    def __init__(self, in_channels, out_channels, stride, cardinality, base_width, expansion,  M, r, L):
         super(Bottleneck, self).__init__()
+        width_ratio = out_channels / (expansion * 64.)
+        D = cardinality * int(base_width * width_ratio)
+
         self.relu = nn.ReLU(inplace=True)
-        self.feas = nn.Sequential(
-            nn.Conv2d(in_features, out_features, 1, stride=1),
-            nn.BatchNorm2d(out_features),
-            SKConv(out_features, M, G, r, stride=stride, L=L),
-            nn.BatchNorm2d(out_features),
-            nn.Conv2d(out_features, out_features, 1, stride=1),
-            nn.BatchNorm2d(out_features)
-        )
-        if in_features == out_features:  # when dim not change, in could be added diectly to out
-            self.shortcut = nn.Sequential()
-        else:  # when dim not change, in should also change dim to be added to out
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_features, out_features, 1, stride=stride),
-                nn.BatchNorm2d(out_features)
-            )
+
+        self.conv_reduce = nn.Conv2d(
+            in_channels, D, kernel_size=1, stride=1, padding=0, bias=False)
+        self.bn_reduce = nn.BatchNorm2d(D)
+
+        self.conv_sk = SKConv(D, M, cardinality, r, stride=stride, L=L)
+        self.bn = nn.BatchNorm2d(D)
+        self.conv_expand = nn.Conv2d(
+            D, out_channels, kernel_size=1, stride=1, padding=0, bias=False)
+        self.bn_expand = nn.BatchNorm2d(out_channels)
+
+        self.shortcut = nn.Sequential()
+        if in_channels != out_channels:
+            self.shortcut.add_module('shortcut_conv',
+                                     nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, padding=0,
+                                               bias=False))
+            self.shortcut.add_module(
+                'shortcut_bn', nn.BatchNorm2d(out_channels))
 
     def forward(self, x):
-        fea = self.feas(x)
-        return self.relu(fea + self.shortcut(x))
+        out = self.conv_reduce.forward(x)
+        out = self.relu(self.bn_reduce.forward(out))
+        out = self.conv_sk.forward(out)
+        out = self.relu(self.bn.forward(out))
+        out = self.conv_expand.forward(out)
+        out = self.bn_expand.forward(out)
+        residual = self.shortcut.forward(x)
+        return self.relu(residual + out)
 
 
-class SKNet(nn.Module):
-    def __init__(self, depth, num_classes,  M=2, G=8, r=1):
-        super(SKNet, self).__init__()
+class SkResNeXt(nn.Module):
+    def __init__(self, cardinality, depth, num_classes, base_width, expansion=4, M=2, r=32, L=32):
+        super(SkResNeXt, self).__init__()
         self.M = M
-        self.G = G
         self.r = r
+        self.L = L
+        self.cardinality = cardinality
         self.depth = depth
         self.block_depth = (self.depth - 2) // 9
+        self.base_width = base_width
+        self.expansion = expansion
         self.num_classes = num_classes
-        self.stages = [64, 64 * 4, 128 * 4, 256 * 4]
+        self.output_size = 64
+        self.stages = [64, 64 * self.expansion, 128 *
+                       self.expansion, 256 * self.expansion]
 
         self.conv_1_3x3 = nn.Conv2d(3, 64, 3, 1, 1, bias=False)
         self.bn_1 = nn.BatchNorm2d(64)
-        self.stage_1 = self.block(
-            'stage_1', self.stages[0], self.stages[1], self.M, self.G, self.r, stride=1)
-        self.stage_2 = self.block(
-            'stage_2', self.stages[1], self.stages[2], self.M, self.G, self.r, stride=2)
-        self.stage_3 = self.block(
-            'stage_3', self.stages[2], self.stages[3], self.M, self.G, self.r, stride=2)
+        self.stage_1 = self.block('stage_1', self.stages[0], self.stages[1], 1)
+        self.stage_2 = self.block('stage_2', self.stages[1], self.stages[2], 2)
+        self.stage_3 = self.block('stage_3', self.stages[2], self.stages[3], 2)
         self.fc = nn.Linear(self.stages[3], num_classes)
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -122,16 +127,17 @@ class SKNet(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def block(self, name, in_channels, out_channels, M, G, r, stride=2):
+    def block(self, name, in_channels, out_channels, pool_stride=2):
         block = nn.Sequential()
         for bottleneck in range(self.block_depth):
             name_ = '%s_bottleneck_%d' % (name, bottleneck)
             if bottleneck == 0:
-                block.add_module(name_, Bottleneck(
-                    in_channels, out_channels, M, G, r, stride=stride))
+                block.add_module(name_, Bottleneck(in_channels, out_channels, pool_stride, self.cardinality,
+                                                   self.base_width, self.expansion, self.M, self.r, self.L))
             else:
-                block.add_module(name_, Bottleneck(
-                    out_channels, out_channels, M, G, r, stride=1))
+                block.add_module(name_,
+                                 Bottleneck(out_channels, out_channels, 1, self.cardinality, self.base_width,
+                                            self.expansion, self.M, self.r, self.L))
         return block
 
     def forward(self, x):
@@ -145,9 +151,9 @@ class SKNet(nn.Module):
         return self.fc(x)
 
 
-def sk_resnext29_8x64d(num_classes):
-    return SKNet(depth=29, num_classes=num_classes, M=2, G=8, r=2)
+def sk_resnext29_16x32d(num_classes):
+    return SkResNeXt(cardinality=16, depth=29, num_classes=num_classes, base_width=32)
 
 
 def sk_resnext29_16x64d(num_classes):
-    return SKNet(depth=29, num_classes=num_classes, M=2, G=16, r=2)
+    return SkResNeXt(cardinality=16, depth=29, num_classes=num_classes, base_width=64)
