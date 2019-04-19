@@ -77,8 +77,9 @@ The training log will be dumped via logging, check ``log.txt`` in your work path
 | densenet100bc         | 0.76M  |     64     |  300  |      95.08       |       77.55       |
 | densenet190bc         | 25.6M  |     64     |  300  |      96.11       |       82.59       |
 | resnext29_16x64d      | 68.1M  |    128     |  300  |      95.94       |       83.18       |
-| se_resnext29_16x64d   | 68.6M  |    128     |  300  |    **96.15**     |     **83.65**     |
-| cbam_resnext29_16x64d | 68.6M  |    128     |  300  |    **96.27**     |       83.62       |
+| se_resnext29_16x64d   | 68.6M  |    128     |  300  |      96.15       |     **83.65**     |
+| cbam_resnext29_16x64d | 68.7M  |    128     |  300  |    **96.27**     |       83.62       |
+| ge_resnext29_16x64d   | 70.0M  |    128     |  300  |      96.21       |       83.57       |
 
 
 ### With additional regularization
@@ -102,6 +103,7 @@ and the ``√`` means which additional method be used. :cake:
 | se_resnext29_16x64d      |  300  |        |   √   |      96.86       |
 | se_resnext29_16x64d      |  300  |   √    |   √   |    **97.03**     |
 | cbam_resnext29_16x64d    |  300  |   √    |   √   |    **97.16**     |
+| ge_resnext29_16x64d      |  300  |   √    |   √   |    **97.19**     |
 | --                       |  --   |   --   |  --   |        --        |
 | shake_resnet26_2x64d     | 1800  |        |       |      96.94       |
 | shake_resnet26_2x64d     | 1800  |   √    |       |    **97.20**     |
@@ -138,6 +140,7 @@ Provided codes were adapted from
 - [BIGBALLON/cifar-10-cnn](https://github.com/BIGBALLON/cifar-10-cnn)
 - [BayesWatch/pytorch-GENet](https://github.com/BayesWatch/pytorch-GENet/)
 - [Jongchan/attention-module](https://github.com/Jongchan/attention-module)
+- [pppLang/SKNet](https://github.com/pppLang/SKNet)
 
 
 Feel free to contact me if you have any suggestions or questions, issues are welcome,   
