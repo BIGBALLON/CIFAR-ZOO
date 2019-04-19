@@ -66,19 +66,19 @@ The training log will be dumped via logging, check ``log.txt`` in your work path
 
 ### Vanilla architecures
 
-| architecure           | GPU(1080TI) | params | batch size | epoch | C10 test acc (%) | C100 test acc (%) |
-| :-------------------- | :---------: | :----: | :--------: | :---: | :--------------: | :---------------: |
-| Lecun                 |     x 1     |  62K   |    128     |  250  |      67.46       |       34.10       |
-| alexnet               |     x 1     |  2.4M  |    128     |  250  |      75.56       |       38.67       |
-| vgg19                 |     x 1     |  20M   |    128     |  250  |      93.00       |       72.07       |
-| preresnet20           |     x 1     | 0.27M  |    128     |  250  |      91.88       |       67.03       |
-| preresnet110          |     x 1     |  1.7M  |    128     |  250  |      94.24       |       72.96       |
-| preresnet1202         |     x 2     | 19.4M  |    128     |  250  |      94.74       |       75.28       |
-| densenet100bc         |     x 2     | 0.76M  |     64     |  300  |      95.08       |       77.55       |
-| densenet190bc         |     x 4     | 25.6M  |     64     |  300  |      96.11       |       82.59       |
-| resnext29_16x64d      |     x 2     | 68.1M  |    128     |  300  |      95.94       |       83.18       |
-| se_resnext29_16x64d   |     x 2     | 68.6M  |    128     |  300  |    **96.15**     |     **83.65**     |
-| cbam_resnext29_16x64d |     x 2     | 68.6M  |    128     |  300  |    **96.27**     |       83.62       |
+| architecure           | params | batch size | epoch | C10 test acc (%) | C100 test acc (%) |
+| :-------------------- | :----: | :--------: | :---: | :--------------: | :---------------: |
+| Lecun                 |  62K   |    128     |  250  |      67.46       |       34.10       |
+| alexnet               |  2.4M  |    128     |  250  |      75.56       |       38.67       |
+| vgg19                 |  20M   |    128     |  250  |      93.00       |       72.07       |
+| preresnet20           | 0.27M  |    128     |  250  |      91.88       |       67.03       |
+| preresnet110          |  1.7M  |    128     |  250  |      94.24       |       72.96       |
+| preresnet1202         | 19.4M  |    128     |  250  |      94.74       |       75.28       |
+| densenet100bc         | 0.76M  |     64     |  300  |      95.08       |       77.55       |
+| densenet190bc         | 25.6M  |     64     |  300  |      96.11       |       82.59       |
+| resnext29_16x64d      | 68.1M  |    128     |  300  |      95.94       |       83.18       |
+| se_resnext29_16x64d   | 68.6M  |    128     |  300  |    **96.15**     |     **83.65**     |
+| cbam_resnext29_16x64d | 68.6M  |    128     |  300  |    **96.27**     |       83.62       |
 
 
 ### With additional regularization
