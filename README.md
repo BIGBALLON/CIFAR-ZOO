@@ -64,9 +64,9 @@ The training log will be dumped via logging, check ``log.txt`` in your work path
 
 ## Results on CIFAR
 
-### Vanilla architecures
+### Vanilla architectures
 
-| architecure           | params | batch size | epoch | C10 test acc (%) | C100 test acc (%) |
+| architecture          | params | batch size | epoch | C10 test acc (%) | C100 test acc (%) |
 | :-------------------- | :----: | :--------: | :---: | :--------------: | :---------------: |
 | Lecun                 |  62K   |    128     |  250  |      67.46       |       34.10       |
 | alexnet               |  2.4M  |    128     |  250  |      75.56       |       38.67       |
@@ -88,7 +88,7 @@ The training log will be dumped via logging, check ``log.txt`` in your work path
 PS: the default data augmentation methods are ``RandomCrop`` + ``RandomHorizontalFlip`` + ``Normalize``,   
 and the ``√`` means which additional method be used. :cake:
 
-| architecure              | epoch | cutout | mixup | C10 test acc (%) |
+| architecture             | epoch | cutout | mixup | C10 test acc (%) |
 | :----------------------- | :---: | :----: | :---: | :--------------: |
 | preresnet20              |  250  |        |       |      91.88       |
 | preresnet20              |  250  |   √    |       |      92.57       |
@@ -115,7 +115,7 @@ It's cool, right?
  
 ### With different LR scheduler
 
-| architecure  | epoch | step decay | cosine | htd(-6,3) | cutout | mixup | C10 test acc (%) |
+| architecture | epoch | step decay | cosine | htd(-6,3) | cutout | mixup | C10 test acc (%) |
 | :----------- | :---: | :--------: | :----: | :-------: | :----: | :---: | :--------------: |
 | preresnet20  |  250  |     √      |        |           |        |       |      91.88       |
 | preresnet20  |  250  |            |   √    |           |        |       |      92.13       |
