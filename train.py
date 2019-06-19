@@ -130,7 +130,7 @@ def test(test_loader, net, criterion, optimizer, epoch, device):
 
 def main():
     global args, config, last_epoch, best_prec, writer
-    writer = SummaryWriter(log_dir=args.work_path + '/event')
+    writer = SummaryWriter(logdir=args.work_path + '/event')
 
     # read config from yaml file
     with open(args.work_path + '/config.yaml') as f:
