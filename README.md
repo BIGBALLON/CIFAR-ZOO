@@ -30,10 +30,10 @@ This repository contains the pytorch code for multiple CNN architectures and imp
 
 ### Requirements
 
-- Python >= 3.5
-- PyTorch >= 0.4 
+- Python (3.6)
+- PyTorch (1.0.0)
 - TensorFlow/Tensorboard (if you want to use the tensorboard for **visualization**)
-- Other dependencies (pyyaml, easydict, tensorboardX)
+- Other dependencies (pyyaml, easydict, tensorboardX >= 1.8)
 
 ```bash
 pip install -r requirements.txt
