@@ -155,7 +155,7 @@ class SeResNeXt(nn.Module):
         x = self.stage_1.forward(x)
         x = self.stage_2.forward(x)
         x = self.stage_3.forward(x)
-        x = F.avg_pool2d(x, 8, 1)
+        x = F.avg_pool2d(x, x.size(3), 1)
         x = x.view(-1, self.stages[3])
         return self.fc(x)
 
