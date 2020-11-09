@@ -1,12 +1,10 @@
 # -*-coding:utf-8-*-
 import torch.nn as nn
 
-
-__all__ = ['alexnet']
+__all__ = ["alexnet"]
 
 
 class AlexNet(nn.Module):
-
     def __init__(self, num_classes):
         super(AlexNet, self).__init__()
         self.features = nn.Sequential(

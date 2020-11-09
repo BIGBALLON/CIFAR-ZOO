@@ -2,6 +2,9 @@
 
 <img src="https://user-images.githubusercontent.com/7837172/44953557-0fb54e80-aec9-11e8-9d38-2388bc70c5c5.png" width=15% align="right" /> 
 
+Status: **Archive** ( Final test with **PyTorch 1.7** and no longer maintained, I would recommend you to use [pycls](https://github.com/facebookresearch/pycls) powered by [FAIR](https://github.com/facebookresearch), which is a simple and flexible codebase for image classification )
+
+
 This repository contains the pytorch code for multiple CNN architectures and improve methods based on the following papers, **hope the implementation and results will helpful for your research**!!
 
 - Architecure

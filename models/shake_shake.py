@@ -5,12 +5,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-
-__all__ = ['shake_resnet26_2x32d', 'shake_resnet26_2x64d']
+__all__ = ["shake_resnet26_2x32d", "shake_resnet26_2x64d"]
 
 
 class ShakeShake(torch.autograd.Function):
-
     @staticmethod
     def forward(ctx, x1, x2, training=True):
         if training:
@@ -30,14 +28,11 @@ class ShakeShake(torch.autograd.Function):
 
 
 class Shortcut(nn.Module):
-
     def __init__(self, in_ch, out_ch, stride):
         super(Shortcut, self).__init__()
         self.stride = stride
-        self.conv1 = nn.Conv2d(in_ch, out_ch // 2, 1,
-                               stride=1, padding=0, bias=False)
-        self.conv2 = nn.Conv2d(in_ch, out_ch // 2, 1,
-                               stride=1, padding=0, bias=False)
+        self.conv1 = nn.Conv2d(in_ch, out_ch // 2, 1, stride=1, padding=0, bias=False)
+        self.conv2 = nn.Conv2d(in_ch, out_ch // 2, 1, stride=1, padding=0, bias=False)
         self.bn = nn.BatchNorm2d(out_ch)
 
     def forward(self, x):
@@ -54,12 +49,10 @@ class Shortcut(nn.Module):
 
 
 class ShakeBlock(nn.Module):
-
     def __init__(self, in_ch, out_ch, stride=1):
         super(ShakeBlock, self).__init__()
         self.equal_io = in_ch == out_ch
-        self.shortcut = self.equal_io and None or Shortcut(
-            in_ch, out_ch, stride=stride)
+        self.shortcut = self.equal_io and None or Shortcut(in_ch, out_ch, stride=stride)
 
         self.branch1 = self._make_branch(in_ch, out_ch, stride)
         self.branch2 = self._make_branch(in_ch, out_ch, stride)
@@ -78,11 +71,11 @@ class ShakeBlock(nn.Module):
             nn.BatchNorm2d(out_ch),
             nn.ReLU(inplace=False),
             nn.Conv2d(out_ch, out_ch, 3, padding=1, stride=1, bias=False),
-            nn.BatchNorm2d(out_ch))
+            nn.BatchNorm2d(out_ch),
+        )
 
 
 class ShakeResNet(nn.Module):
-
     def __init__(self, depth, base_width, num_classes):
         super(ShakeResNet, self).__init__()
         n_units = (depth - 2) / 6

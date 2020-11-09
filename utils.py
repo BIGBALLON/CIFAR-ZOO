@@ -1,10 +1,10 @@
 # -*-coding:utf-8-*-
-import os
-import math
-import shutil
 import logging
-import numpy as np
+import math
+import os
+import shutil
 
+import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -30,7 +30,7 @@ class Cutout(object):
             x1 = np.clip(x - self.length // 2, 0, w)
             x2 = np.clip(x + self.length // 2, 0, w)
 
-            mask[y1: y2, x1: x2] = 0.
+            mask[y1:y2, x1:x2] = 0.0
 
         mask = torch.from_numpy(mask)
         mask = mask.expand_as(img)
@@ -46,7 +46,8 @@ class Logger(object):
         file_handler = logging.FileHandler(log_file_name)
         console_handler = logging.StreamHandler()
         formatter = logging.Formatter(
-            '[%(asctime)s] - [%(filename)s line:%(lineno)d] : %(message)s')
+            "[%(asctime)s] - [%(filename)s line:%(lineno)3d] : %(message)s"
+        )
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
         self.__logger.addHandler(file_handler)
@@ -73,24 +74,27 @@ def data_augmentation(config, is_train=True):
     aug.append(transforms.ToTensor())
     # normalize  [- mean / std]
     if config.augmentation.normalize:
-        if config.dataset == 'cifar10':
-            aug.append(transforms.Normalize(
-                (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)))
+        if config.dataset == "cifar10":
+            aug.append(
+                transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+            )
         else:
-            aug.append(transforms.Normalize(
-                (0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761)))
+            aug.append(
+                transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))
+            )
 
     if is_train and config.augmentation.cutout:
         # cutout
-        aug.append(Cutout(n_holes=config.augmentation.holes,
-                          length=config.augmentation.length))
+        aug.append(
+            Cutout(n_holes=config.augmentation.holes, length=config.augmentation.length)
+        )
     return aug
 
 
 def save_checkpoint(state, is_best, filename):
-    torch.save(state, filename + '.pth.tar')
+    torch.save(state, filename + ".pth.tar")
     if is_best:
-        shutil.copyfile(filename + '.pth.tar', filename + '_best.pth.tar')
+        shutil.copyfile(filename + ".pth.tar", filename + "_best.pth.tar")
 
 
 def load_checkpoint(path, model, optimizer=None):
@@ -98,49 +102,50 @@ def load_checkpoint(path, model, optimizer=None):
         logging.info("=== loading checkpoint '{}' ===".format(path))
 
         checkpoint = torch.load(path)
-        model.load_state_dict(checkpoint['state_dict'], strict=False)
+        model.load_state_dict(checkpoint["state_dict"], strict=False)
 
         if optimizer is not None:
-            best_prec = checkpoint['best_prec']
-            last_epoch = checkpoint['last_epoch']
-            optimizer.load_state_dict(checkpoint['optimizer'])
-            logging.info("=== done. also loaded optimizer from " +
-                         "checkpoint '{}' (epoch {}) ===".format(
-                             path, last_epoch + 1))
+            best_prec = checkpoint["best_prec"]
+            last_epoch = checkpoint["last_epoch"]
+            optimizer.load_state_dict(checkpoint["optimizer"])
+            logging.info(
+                "=== done. also loaded optimizer from "
+                + "checkpoint '{}' (epoch {}) ===".format(path, last_epoch + 1)
+            )
             return best_prec, last_epoch
 
 
 def get_data_loader(transform_train, transform_test, config):
-    assert config.dataset == 'cifar10' or config.dataset == 'cifar100'
+    assert config.dataset == "cifar10" or config.dataset == "cifar100"
     if config.dataset == "cifar10":
         trainset = torchvision.datasets.CIFAR10(
-            root=config.data_path, train=True,
-            download=True, transform=transform_train)
+            root=config.data_path, train=True, download=True, transform=transform_train
+        )
 
         testset = torchvision.datasets.CIFAR10(
-            root=config.data_path, train=False,
-            download=True, transform=transform_test)
+            root=config.data_path, train=False, download=True, transform=transform_test
+        )
     else:
         trainset = torchvision.datasets.CIFAR100(
-            root=config.data_path, train=True,
-            download=True, transform=transform_train)
+            root=config.data_path, train=True, download=True, transform=transform_train
+        )
 
         testset = torchvision.datasets.CIFAR100(
-            root=config.data_path, train=False,
-            download=True, transform=transform_test)
+            root=config.data_path, train=False, download=True, transform=transform_test
+        )
 
     train_loader = torch.utils.data.DataLoader(
-        trainset, batch_size=config.batch_size,
-        shuffle=True, num_workers=config.workers)
+        trainset, batch_size=config.batch_size, shuffle=True, num_workers=config.workers
+    )
 
     test_loader = torch.utils.data.DataLoader(
-        testset, batch_size=config.test_batch,
-        shuffle=False, num_workers=config.workers)
+        testset, batch_size=config.test_batch, shuffle=False, num_workers=config.workers
+    )
     return train_loader, test_loader
 
 
 def mixup_data(x, y, alpha, device):
-    '''Returns mixed inputs, pairs of targets, and lambda'''
+    """Returns mixed inputs, pairs of targets, and lambda"""
     if alpha > 0:
         lam = np.random.beta(alpha, alpha)
     else:
@@ -160,29 +165,40 @@ def mixup_criterion(criterion, pred, y_a, y_b, lam):
 
 def get_current_lr(optimizer):
     for param_group in optimizer.param_groups:
-        return param_group['lr']
+        return param_group["lr"]
 
 
 def adjust_learning_rate(optimizer, epoch, config):
     lr = get_current_lr(optimizer)
-    if config.lr_scheduler.type == 'STEP':
+    if config.lr_scheduler.type == "STEP":
         if epoch in config.lr_scheduler.lr_epochs:
             lr *= config.lr_scheduler.lr_mults
-    elif config.lr_scheduler.type == 'COSINE':
+    elif config.lr_scheduler.type == "COSINE":
         ratio = epoch / config.epochs
-        lr = config.lr_scheduler.min_lr + \
-            (config.lr_scheduler.base_lr - config.lr_scheduler.min_lr) * \
-            (1.0 + math.cos(math.pi * ratio)) / 2.0
-    elif config.lr_scheduler.type == 'HTD':
+        lr = (
+            config.lr_scheduler.min_lr
+            + (config.lr_scheduler.base_lr - config.lr_scheduler.min_lr)
+            * (1.0 + math.cos(math.pi * ratio))
+            / 2.0
+        )
+    elif config.lr_scheduler.type == "HTD":
         ratio = epoch / config.epochs
-        lr = config.lr_scheduler.min_lr + \
-            (config.lr_scheduler.base_lr - config.lr_scheduler.min_lr) * \
-            (1.0 - math.tanh(
-                config.lr_scheduler.lower_bound
-                + (config.lr_scheduler.upper_bound
-                   - config.lr_scheduler.lower_bound)
-                * ratio)
-             ) / 2.0
+        lr = (
+            config.lr_scheduler.min_lr
+            + (config.lr_scheduler.base_lr - config.lr_scheduler.min_lr)
+            * (
+                1.0
+                - math.tanh(
+                    config.lr_scheduler.lower_bound
+                    + (
+                        config.lr_scheduler.upper_bound
+                        - config.lr_scheduler.lower_bound
+                    )
+                    * ratio
+                )
+            )
+            / 2.0
+        )
     for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
+        param_group["lr"] = lr
     return lr
